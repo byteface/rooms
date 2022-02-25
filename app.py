@@ -51,7 +51,9 @@ _webpage = lambda scene: html(head(
         # this bugs the controls?
         # <script src="https://unpkg.com/aframe-fps-look-controls-component/dist/aframe-fps-look-controls-component.min.js"></script>
 
-        script(_src="//cdn.rawgit.com/donmccurdy/aframe-extras/v4.1.1/dist/aframe-extras.min.js"),
+        # script(_src="//cdn.rawgit.com/donmccurdy/aframe-extras/v4.1.1/dist/aframe-extras.min.js"),
+        script(_src="//cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"),
+        script(_src="https://unpkg.com/aframe-room-component/dist/aframe-room-component.min.js"),
 
         _scripts
     ),
@@ -77,6 +79,27 @@ _home = scene(
       box(_position="-1 0.5 -5", _rotation="45 45 0", _color="#4CC3D9", _class="portal", _href="/"),
       sphere(_position="2 1.25 -5", _radius="1.25", _color="#EF2D5E"),
       plane(_position="0 0 -4", _rotation="-90 0 0", _width="40", _height="4", _color="#7BC8A4"),
+
+        '''
+        <rw-room position="-2 0 -2" material="color:#866">
+            <rw-wall position="4 0 0"></rw-wall>
+            <rw-wall position="4 0 4"></rw-wall>
+            <rw-wall position="0 0 4"></rw-wall>
+            <rw-wall position="0 0 0">
+                <rw-doorhole id="holeA"></rw-doorhole>
+                <rw-doorlink from="#holeA" to="#holeB" position="2.5 0 0"></rw-doorlink>
+            </rw-wall>
+        </rw-room>
+        <rw-room position="0 0 -3">
+            <rw-wall position=" 1 0 -1" material="color:#787"></rw-wall>
+            <rw-wall position=" 1 0  1" material="color:#877">
+                <rw-doorhole id="holeB"></rw-doorhole>
+            </rw-wall>
+            <rw-wall position="-1 0  1" material="color:#878"></rw-wall>
+            <rw-wall position="-1 0 -1" material="color:#778"></rw-wall>
+        </rw-room>
+        ''',
+
       sky(_color="#ECECEC"),
       '<a-camera foo><a-camera>',
     )
@@ -105,8 +128,13 @@ def room():
       box(_position="-1 0.5 -3", _rotation="0 45 0", _color="#4CC3D9", _href="/home"),
       plane(_position="0 0 -4", _rotation="-90 0 0", _width="400", _height="400", _color="#7BC8A4"),
       sky(_color="#ECECEC"),
-      entity( _id="rig", **{"_movement-controls":"fly: true; speed: 0.3"}, _position="25 0 25"),
-      '<a-camera camera look-controls="pointerLockEnabled: true"><a-camera>',
+      # entity( _id="rig", **{"_movement-controls":"fly: true; speed: 0.3"}, _position="25 0 25"),
+      # '<a-camera camera look-controls="pointerLockEnabled: true"><a-camera>',
+
+    '''<a-entity movement-controls="fly: true">
+      <a-entity camera position="0 1.6 0" look-controls></a-entity>
+    </a-entity>'''
+
     )
     return HTMLResponse(str(
         _webpage(room)
