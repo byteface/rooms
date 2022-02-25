@@ -5,6 +5,8 @@ from fastapi.responses import HTMLResponse
 from domonic.html import *
 from functools import lru_cache
 
+from domonic import domonic
+
 import os
 # from domonic.html import *
 from domonic.xml.aframe import *
@@ -69,7 +71,7 @@ _scene = scene(
       sphere(_position="0 1.25 -5", _radius="1.25", _color="#EF2D5E", _class="portal", _href="/room"),
       cylinder(_position="1 0.75 -3", _radius="0.5", _height="1.5", _color="#FFC65D"),
       plane(_position="0 0 -4", _rotation="-90 0 0", _width="40", _height="4", _color="#7BC8A4"),
-      # entity(_text="value: Welcome to the rooms. Go an explore!", material="color: blue", _geometry="primitive: plane; width: 4; height: auto"),
+      entity(_text="value: Welcome to the rooms. Go explore!", material="color: blue", _geometry="primitive: plane; width: 4; height: auto"),
       sky(_color="#ECECEC"),
       '<a-camera foo><a-camera>',
     )
@@ -153,6 +155,40 @@ def random_room():
         _webpage(room)
     ))
 
+# use svg as map
+@app.get("/map")
+def map(map: int = 1):
+    # load svg
+    with open(f"static/maps/map{map}.svg", "r") as f:
+        svgcontent = f.read()
+    mapdata = domonic.parseString(svgcontent)
+    walls = mapdata.querySelectorAll("rect")
+    walls3d = []
+    # build the walls from the svg
+    for w in walls:
+        # print('sup!')
+        b = box(
+            _position=f"{int(float(w.getAttribute('x')))/100} 0 {int(float(w.getAttribute('y')))/100}",
+            _rotation="0 0 0",
+            _width=int(float(w.getAttribute('width'))/100),
+            _height=int(float(w.getAttribute('height'))/100),
+            _color="#000000",
+            _class="wall",
+            # _geometry="primitive: box; width: {w.getAttribute('width')}; height: {w.getAttribute('height')}; depth: 0.1",
+        )
+        walls3d.append(str(b))
+
+    # print(walls3d)
+    room = scene(
+      # box(_position="-1 0.5 -3", _rotation="0 45 0", _color="#4CC3D9"),
+      plane(_position="0 0 -4", _rotation="-90 0 0", _width="40", _height="4", _color="#7BC8A4"),
+      ''.join(walls3d),
+      sky(_color="#ECECEC"),
+      '<a-camera camera><a-camera>',
+    )
+    return HTMLResponse(str(
+        _webpage(room)
+    ))
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
