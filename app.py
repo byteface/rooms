@@ -146,6 +146,8 @@ def room():
 @app.get("/random")
 def random_room(seed=0):
 
+    import random
+
     def seed_to_random_hex_colour(number):
         numByte = str.encode(str(number))
         from hashlib import sha256
@@ -156,10 +158,10 @@ def random_room(seed=0):
     floor_color = seed_to_random_hex_colour(seed+seed)
     # print(col)
     room = scene(
-      box(_position="-1 0.5 -3", _rotation="0 45 0", _color="#4CC3D9"),
+      box(_position="-1 0.5 -3", _rotation="0 45 0", _color="#4CC3D9", _class="portal", _href="/random?seed="+str(random.randint(0,1000000))),
       plane(_position="0 0 -4", _rotation="-90 0 0", _width="40", _height="4", _color=floor_color),
       sky(_color=sky_color),
-      '<a-camera camera><a-camera>',
+      '<a-camera foo><a-camera>',
     )
     return HTMLResponse(str(
         _webpage(room)
