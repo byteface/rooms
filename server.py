@@ -74,6 +74,7 @@ _scene = scene(
       entity(_text="value: Welcome to the rooms. Go explore!", material="color: blue", _geometry="primitive: plane; width: 4; height: auto"),
       sky(_color="#ECECEC"),
       '<a-camera foo><a-camera>',
+      **{"_device-orientation-permission-ui":"enabled: false"},
     )
 
 # default home without a user edit
@@ -104,8 +105,9 @@ _home = scene(
 
       sky(_color="#ECECEC"),
       '<a-camera foo><a-camera>',
+      **{"_device-orientation-permission-ui":"enabled: false"},
     )
-            
+
 app = FastAPI()
 
 # lobby
@@ -162,6 +164,7 @@ def random_room(seed=0):
       plane(_position="0 0 -4", _rotation="-90 0 0", _width="40", _height="4", _color=floor_color),
       sky(_color=sky_color),
       '<a-camera foo><a-camera>',
+      **{"_device-orientation-permission-ui":"enabled: false"},
     )
     return HTMLResponse(str(
         _webpage(room)
@@ -197,6 +200,7 @@ def map(map: int = 1):
       ''.join(walls3d),
       sky(_color="#ECECEC"),
       '<a-camera camera><a-camera>',
+      **{"_device-orientation-permission-ui":"enabled: false"},
     )
     return HTMLResponse(str(
         _webpage(room)
