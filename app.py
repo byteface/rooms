@@ -142,13 +142,23 @@ def room():
         _webpage(room)
     ))
 
-# generate a random room
+# generate a random room (from a seed) i.e. /random?seed=123 would always make the same thing
 @app.get("/random")
-def random_room():
+def random_room(seed=0):
+
+    def seed_to_random_hex_colour(number):
+        numByte = str.encode(str(number))
+        from hashlib import sha256
+        hashed = sha256(numByte).hexdigest()
+        return "#" + hashed[:6]
+
+    sky_color = seed_to_random_hex_colour(seed)
+    floor_color = seed_to_random_hex_colour(seed+seed)
+    # print(col)
     room = scene(
       box(_position="-1 0.5 -3", _rotation="0 45 0", _color="#4CC3D9"),
-      # plane(_position="0 0 -4", _rotation="-90 0 0", _width="40", _height="4", _color="#7BC8A4"),
-      sky(_color="#ECECEC"),
+      plane(_position="0 0 -4", _rotation="-90 0 0", _width="40", _height="4", _color=floor_color),
+      sky(_color=sky_color),
       '<a-camera camera><a-camera>',
     )
     return HTMLResponse(str(
