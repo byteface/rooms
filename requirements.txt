@@ -4,7 +4,7 @@ certifi==2021.10.8
 charset-normalizer==2.0.12
 click==8.0.4
 cssselect==1.1.0
-domonic==0.9.6
+domonic==0.9.7
 elementpath==2.4.0
 fastapi==0.74.1
 h11==0.13.0

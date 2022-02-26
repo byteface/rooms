@@ -1,0 +1,13 @@
+[Unit]
+Description=boots uvicorn
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/Desktop/rooms
+ExecStart=/home/ubuntu/.local/bin/uvicorn server:app --uds /tmp/uvicorn.sock
+
+[Install]
+WantedBy=multi-user.target
+
