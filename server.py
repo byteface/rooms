@@ -13,14 +13,69 @@ from domonic.xml.aframe import *
 from domonic.CDN import *
 
 _scripts = script("""
+var username = "Player" + Math.round(Math.random()*1000);
+var players = [];
+
 AFRAME.registerComponent("foo", {
     init: function() {
       this.portals = document.querySelectorAll('.portal') // TODO - use a class?
-      console.log("PPP", this.portals)
-      //this.box = document.querySelector('a-box')
-      //this.text = document.querySelector("a-text")
+      this.socket = new WebSocket('ws://0.0.0.0:8008'); // 0.0.0.0 is locahost ONLY. use 127.0.0.1 for testing later
+      this.username = username;
+//      alert(this.username);
+
+        this.socket.onopen = function(e) {
+            console.log("[open] Connection established");
+            console.log("Sending to server");
+            var package = {"username":this.username};
+            //this.socket.send(JSON.stringify(package));
+        };
+
+        this.socket.onmessage = function(event) {
+            var server_data = JSON.parse(event.data);
+            // console.log(server_data);
+            for (var key in server_data) {
+                if (server_data.hasOwnProperty(key)) {
+                    // console.log(key + " -> " + server_data[key]);
+                    if(key != username){
+                    //    console.log('THIS PLAYER IS NOT ME!', key, username);
+                        
+                        // if key not in players, add it
+                        if(players.indexOf(key) == -1){    
+                            var sceneEl = document.querySelector("a-scene");
+                            var p = document.createElement("a-box");
+                            p.setAttribute("color", "red");
+                            p.setAttribute("id", key);
+                            //console.log('THE DATA IS', server_data[key]);
+                            //p.setAttribute("position", server_data[key]);
+                            sceneEl.appendChild(p);
+                            players.push(key);
+                        }else{
+                            //console.log('THIS PLAYER IS ME!', key, username);
+                            var p = document.querySelector("#"+key);
+                            p.setAttribute("position", server_data[key].position.x + " " + server_data[key].position.y + " " + server_data[key].position.z);
+                            //console.log('GOT HIM!', server_data[key]);
+                        }
+                    }
+                }
+            }
+        };
+
+        this.socket.onclose = function(event) {
+        if (event.wasClean) {
+            alert(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+        } else {
+            // e.g. server process killed or network down
+            // event.code is usually 1006 in this case
+            alert('[close] Connection died');
+        }
+        };
+
+        this.socket.onerror = function(error) {
+        alert(`[error] ${error.message}`);
+        };
+
     },
-    tick: function() {
+    tick: function() {  
       let camPos = this.el.object3D.position
       for( var i=0; i<this.portals.length; i++){
         let p = this.portals[i]
@@ -29,20 +84,42 @@ AFRAME.registerComponent("foo", {
             window.location = p.getAttribute('href')
         }
       }
+      if (this.el.object3D) {
+          //console.log("YAY",this.el.object3D);
 
-      //let boxPos = this.box.object3D.position
-      //this.text.setAttribute("value", camPos.distanceTo(boxPos))
-      //window.console.log(camPos.distanceTo(boxPos))
-
-      // if the distance is less than 1.5 follow the url
-      //if(camPos.distanceTo(boxPos)<1.5){ 
-        //window.console.log(this.box.getAttribute('href'))
-        // if it leaves our server pop up and tells the user the are going to load someone elses server
-        //window.location = this.box.getAttribute('href')
-      //}
-
+            degToRad = function(degrees) {
+                return degrees * Math.PI / 180;
+            }
+            radToDeg = function(radians) {
+                return radians * 180 / Math.PI;
+            }
+            function send_package(username, player, socket){
+               // console.log('send_package!',player.object3D);
+                var position = player.object3D.position.clone();
+                var rotation = radToDeg(player.object3D.rotation.y);
+                // console.log(rotation);
+                var package = {
+                    "username":username,
+                    "position":position,
+                    "rotation":rotation
+                }
+                //socket.send(JSON.stringify(package));
+                // only send if socket is open
+                if(socket.readyState == 1){
+                    socket.send(JSON.stringify(package));
+                }
+            }
+            send_package(this.username, this.el, this.socket);
+        }
     }
 })
+
+
+
+</script>
+
+
+
 """)
 
 # wrapper for all pages
