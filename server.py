@@ -1,4 +1,3 @@
-
 import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
@@ -18,42 +17,31 @@ var players = [];
 
 AFRAME.registerComponent("foo", {
     init: function() {
-      this.portals = document.querySelectorAll('.portal') // TODO - use a class?
+      this.portals = document.querySelectorAll('.portal');
       this.socket = new WebSocket('ws://0.0.0.0:8008'); // 0.0.0.0 is locahost ONLY. use 127.0.0.1 for testing later
       this.username = username;
-//      alert(this.username);
 
         this.socket.onopen = function(e) {
-            console.log("[open] Connection established");
-            console.log("Sending to server");
+            //console.log("[open] Connection established");
             var package = {"username":this.username};
             //this.socket.send(JSON.stringify(package));
         };
 
         this.socket.onmessage = function(event) {
             var server_data = JSON.parse(event.data);
-            // console.log(server_data);
             for (var key in server_data) {
                 if (server_data.hasOwnProperty(key)) {
-                    // console.log(key + " -> " + server_data[key]);
                     if(key != username){
-                    //    console.log('THIS PLAYER IS NOT ME!', key, username);
-                        
-                        // if key not in players, add it
                         if(players.indexOf(key) == -1){    
                             var sceneEl = document.querySelector("a-scene");
                             var p = document.createElement("a-box");
                             p.setAttribute("color", "red");
                             p.setAttribute("id", key);
-                            //console.log('THE DATA IS', server_data[key]);
-                            //p.setAttribute("position", server_data[key]);
                             sceneEl.appendChild(p);
                             players.push(key);
                         }else{
-                            //console.log('THIS PLAYER IS ME!', key, username);
                             var p = document.querySelector("#"+key);
                             p.setAttribute("position", server_data[key].position.x + " " + server_data[key].position.y + " " + server_data[key].position.z);
-                            //console.log('GOT HIM!', server_data[key]);
                         }
                     }
                 }
@@ -85,8 +73,6 @@ AFRAME.registerComponent("foo", {
         }
       }
       if (this.el.object3D) {
-          //console.log("YAY",this.el.object3D);
-
             degToRad = function(degrees) {
                 return degrees * Math.PI / 180;
             }
@@ -94,17 +80,13 @@ AFRAME.registerComponent("foo", {
                 return radians * 180 / Math.PI;
             }
             function send_package(username, player, socket){
-               // console.log('send_package!',player.object3D);
                 var position = player.object3D.position.clone();
                 var rotation = radToDeg(player.object3D.rotation.y);
-                // console.log(rotation);
                 var package = {
                     "username":username,
                     "position":position,
                     "rotation":rotation
                 }
-                //socket.send(JSON.stringify(package));
-                // only send if socket is open
                 if(socket.readyState == 1){
                     socket.send(JSON.stringify(package));
                 }
@@ -113,12 +95,7 @@ AFRAME.registerComponent("foo", {
         }
     }
 })
-
-
-
 </script>
-
-
 
 """)
 
