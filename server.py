@@ -111,6 +111,7 @@ AFRAME.registerComponent("foo", {
         }
     }
 })
+
 </script>
 
 """)
@@ -127,7 +128,7 @@ _webpage = lambda scene: html(head(
         script(_src="//cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"),
         script(_src="https://unpkg.com/aframe-room-component/dist/aframe-room-component.min.js"),
         script(_src="https://unpkg.com/aframe-environment-component@1.3.1/dist/aframe-environment-component.min.js"),
-
+        script(_src="https://cdn.jsdelivr.net/gh/diarmidmackenzie/aframe-multi-camera@latest/src/multi-camera.min.js"),
         _scripts
     ),
     body(
@@ -300,8 +301,55 @@ def room(preset=None):
         )))
     # our controller
     world.append(str('<a-camera foo><a-camera>',))
+    
+        #     <a-entity id="camera1" secondary-camera="outputElement:#viewport1" position="-8 1.6 0" rotation="0 -90 0">
+        # </a-entity>
+        # <a-entity id="camera2" secondary-camera="outputElement:#viewport2" position="8 1.6 0" rotation="0 90 0">
+        # </a-entity>
+    
+    world.append(str('''
+        <a-entity id="camera3" secondary-camera="outputElement:#viewport3" position="0 36 0" rotation="-90 0 0">
+        </a-entity>
+    '''))
+    
+    
+    # world.append(str('''
+    #   <a-entity id="camera4" secondary-camera="outputElement:#viewport4" position="-8 1.6 -4" rotation="0 -90 0">
+    #   </a-entity>
+    #   <a-entity id="camera5" secondary-camera="outputElement:#viewport5" position="8 1.6 -4" rotation="0 90 0">
+    #   </a-entity>
+    #   <a-entity id="camera6" secondary-camera="outputElement:#viewport6" position="0 8 -4" rotation="-90 0 0">
+    #   </a-entity>
+    # '''))
+    
+    
+    _wp = _webpage(world)
+    
+    _wp.body.appendChild(str('''
+
+    <!--<div style="position:absolute; top: 10px; left: 30px; width: 400px; height:200px">
+      These cameras are fixed relative to the objects in the scene.
+    </div>
+    <div id="viewport1" style="position:absolute;  border-style: solid; top: 40px; left: 30px; width: 200px; height:200px">
+    </div>
+    <div id="viewport2" style="position:absolute;  border-style: solid; top: 240px; left: 30px; width: 200px; height:200px">
+    </div>-->
+    <div id="viewport3"style="position:absolute; border-style: solid; top: 440px; left: 30px; width: 200px; height:200px">
+    </div>
+    <!--<div style="position:absolute; text-align: right; top: 10px; right: 30px; width: 400px; height:200px">
+      These cameras are in fixed world positions.
+    </div>
+    <div id="viewport4" style="position:absolute;  border-style: solid; top: 40px; right: 30px; width: 200px; height:200px">
+    </div>
+    <div id="viewport5" style="position:absolute;  border-style: solid; top: 240px; right: 30px; width: 200px; height:200px">
+    </div>
+    <div id="viewport6"style="position:absolute; border-style: solid; top: 440px; right: 30px; width: 200px; height:200px">
+    </div>-->
+                             '''))
+    
+    
     return HTMLResponse(str(
-        _webpage(world)
+        _wp
     ))
 
 if __name__ == "__main__":
