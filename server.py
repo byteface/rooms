@@ -280,20 +280,15 @@ def map(map: int = 1):
 
 @app.get("/environment")
 def room(preset=None):
-    # Valid values: none, default, contact, egypt, checkerboard, forest, goaland, yavapai, goldmine, threetowers, poison, arches, tron, japan, dream, volcano, starry, osiris, moon    
+    envs = ["default", "contact", "egypt", "checkerboard", "forest", "goaland", "yavapai", "goldmine", "threetowers", "poison", "arches", "tron", "japan", "dream", "volcano", "starry", "osiris", "moon"]
     world = scene(
         entity(_environment=f"preset: {preset};"),
-        # '''<a-entity movement-controls="fly: true">
-        # <a-entity camera position="0 1.6 0" look-controls></a-entity>
-        # </a-entity>''',
+        **{"_device-orientation-permission-ui": "enabled: false"},
     )
-    
-    # TODO - create lots of randomly placed boxes with hrefs to random environments
-    envs = ["default", "contact","egypt","checkerboard","forest","goaland","yavapai","goldmine","threetowers","poison","arches","tron","japan","dream","volcano","starry","osiris","moon"]
-    for i in range(0,100):
-        x = random.randint(-100,100)
-        y = random.randint(-2,2)
-        z = random.randint(-100,100)
+    for i in range(0, 100):
+        x = random.randint(-100, 100)
+        y = random.randint(-2, 2)
+        z = random.randint(-100, 100)
         world.append(str(box(
             _position=f"{x} {y} {z}",
             _rotation="0 0 0",
@@ -303,10 +298,8 @@ def room(preset=None):
             _class="portal",
             _href=f"/environment?preset={random.choice(envs)}",
         )))
-    
-    # our controller    
+    # our controller
     world.append(str('<a-camera foo><a-camera>',))
-    
     return HTMLResponse(str(
         _webpage(world)
     ))
