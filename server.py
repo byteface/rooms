@@ -7,6 +7,8 @@ from functools import lru_cache
 from domonic import domonic
 
 import os
+import random
+
 # from domonic.html import *
 from domonic.xml.aframe import *
 from domonic.CDN import *
@@ -124,6 +126,7 @@ _webpage = lambda scene: html(head(
         # script(_src="//cdn.rawgit.com/donmccurdy/aframe-extras/v4.1.1/dist/aframe-extras.min.js"),
         script(_src="//cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"),
         script(_src="https://unpkg.com/aframe-room-component/dist/aframe-room-component.min.js"),
+        script(_src="https://unpkg.com/aframe-environment-component@1.3.1/dist/aframe-environment-component.min.js"),
 
         _scripts
     ),
@@ -272,6 +275,40 @@ def map(map: int = 1):
     )
     return HTMLResponse(str(
         _webpage(room)
+    ))
+
+
+@app.get("/environment")
+def room(preset=None):
+    # Valid values: none, default, contact, egypt, checkerboard, forest, goaland, yavapai, goldmine, threetowers, poison, arches, tron, japan, dream, volcano, starry, osiris, moon    
+    world = scene(
+        entity(_environment=f"preset: {preset};"),
+        # '''<a-entity movement-controls="fly: true">
+        # <a-entity camera position="0 1.6 0" look-controls></a-entity>
+        # </a-entity>''',
+    )
+    
+    # TODO - create lots of randomly placed boxes with hrefs to random environments
+    envs = ["default", "contact","egypt","checkerboard","forest","goaland","yavapai","goldmine","threetowers","poison","arches","tron","japan","dream","volcano","starry","osiris","moon"]
+    for i in range(0,100):
+        x = random.randint(-100,100)
+        y = random.randint(-2,2)
+        z = random.randint(-100,100)
+        world.append(str(box(
+            _position=f"{x} {y} {z}",
+            _rotation="0 0 0",
+            _width=2,
+            _height=2,
+            _color="#4CC3D9",
+            _class="portal",
+            _href=f"/environment?preset={random.choice(envs)}",
+        )))
+    
+    # our controller    
+    world.append(str('<a-camera foo><a-camera>',))
+    
+    return HTMLResponse(str(
+        _webpage(world)
     ))
 
 if __name__ == "__main__":
