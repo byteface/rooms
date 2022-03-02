@@ -1,0 +1,12 @@
+[Unit]
+Description=runs the socket required by rooms
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/Desktop/rooms
+ExecStart=/usr/bin/python3 multi.py
+
+[Install]
+WantedBy=multi-user.target

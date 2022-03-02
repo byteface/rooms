@@ -18,7 +18,9 @@ var players = [];
 AFRAME.registerComponent("foo", {
     init: function() {
       this.portals = document.querySelectorAll('.portal');
-      this.socket = new WebSocket('ws://0.0.0.0:8008'); // 0.0.0.0 is locahost ONLY. use 127.0.0.1 for testing later
+      //this.socket = new WebSocket('ws://eventual.technology:8008');
+      //this.socket = new WebSocket('ws://127.0.0.1:8008');
+      this.socket = new WebSocket('ws://0.0.0.0:8008');
       this.username = username;
 
         this.socket.onopen = function(e) {
@@ -46,20 +48,32 @@ AFRAME.registerComponent("foo", {
                     }
                 }
             }
+
+            // remove any players that are no longer in the list
+            for (var i = 0; i < players.length; i++) {
+                if(server_data.hasOwnProperty(players[i])){
+                    // do nothing
+                }else{
+                    //console.log('removing player');
+                    var p = document.querySelector("#"+players[i]);
+                    p.parentNode.removeChild(p);
+                    players.splice(i, 1);
+                }
+            }
+
         };
 
         this.socket.onclose = function(event) {
-        if (event.wasClean) {
-            alert(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-        } else {
-            // e.g. server process killed or network down
-            // event.code is usually 1006 in this case
-            alert('[close] Connection died');
-        }
+            //if (event.wasClean) {
+            //    alert(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+            //} else {
+                // e.g. server process killed or network down event.code is usually 1006 in this case
+            //    alert('[close] Connection died');
+            //}
         };
 
         this.socket.onerror = function(error) {
-        alert(`[error] ${error.message}`);
+            alert(`[error] ${error.message}`);
         };
 
     },
